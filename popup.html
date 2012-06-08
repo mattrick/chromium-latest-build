@@ -16,21 +16,50 @@
 		<script src="jquery-1.7.2.min.js"></script>
 		<script>
 			// defines
-			
-			var base_url = 'http://commondatastorage.googleapis.com/chromium-browser-continuous/';
-			var base_win_latest = base_url + 'Win/LAST_CHANGE';
-		
 			var os_names = {
 				'win' : 'Windows',
-				'x11' : 'Unix',
 				'mac' : 'MacOS',
-				'linux' : 'Linux'
+				'linux' : 'Linux',
+				'linux64' : 'Linux 64 bit'
 			}
 			
-			var os_download = {
-				'win' : 'Win/'
-			}
+			var os_directories = new Array();
+			var os_archives = new Array();
 			
+			var base_url = 'http://commondatastorage.googleapis.com/chromium-browser-continuous/';
+			
+			
+			// latest
+			// base_url + os_directories[os] + 'LAST_CHANGE'
+			
+			// download link
+			// base_url + os_directories[os] + 'chrome-" + os_archives['win']
+			
+			// Linux
+			// http://commondatastorage.googleapis.com/chromium-browser-continuous/Linux/LAST_CHANGE
+			// http://commondatastorage.googleapis.com/chromium-browser-continuous/Linux/141209/chrome-linux.zip
+			os_directories['linux'] = 'Linux/';
+			os_archives['linux'] = 'linux.zip';
+			
+			// Linux 64 bit
+			// http://commondatastorage.googleapis.com/chromium-browser-continuous/Linux_x64/LAST_CHANGE
+			// http://commondatastorage.googleapis.com/chromium-browser-continuous/Linux_x64/141209/chrome-linux.zip
+			os_directories['linux64'] = 'Linux_x64/';
+			os_archives['linux64'] = 'linux.zip';
+			
+			// Windows
+			// http://commondatastorage.googleapis.com/chromium-browser-continuous/Win/LAST_CHANGE
+			// http://commondatastorage.googleapis.com/chromium-browser-continuous/Win/141182/chrome-win32.zip
+			os_directories['win'] = 'Win/';
+			os_archives['win'] = 'win32.zip';
+			
+			// Mac OS
+			// http://commondatastorage.googleapis.com/chromium-browser-continuous/Mac/LAST_CHANGE	
+			// http://commondatastorage.googleapis.com/chromium-browser-continuous/Mac/141204/chrome-mac.zip
+			os_directories['mac'] = 'Mac/';
+			os_archives['mac'] = 'mac.zip';
+			
+
 			// variables
 			
 			var os = "unknown";
@@ -42,7 +71,7 @@
 				if (navigator.appVersion.indexOf("Mac")!=-1) os = 'mac';
 				if (navigator.appVersion.indexOf("X11")!=-1) os = 'x11';
 				if (navigator.appVersion.indexOf("Linux")!=-1) os = 'linux';
-			
+				
 				re = /Chrome\/(.*)\sSafari/g;
 				version_curr = re.exec(window.navigator.userAgent);
 				version_curr = version_curr[1];
@@ -59,7 +88,7 @@
 				
 				var latest; 
 				
-				$.get(base_win_latest, function(data) {
+				$.get(base_url + os_directories[os] + 'LAST_CHANGE', function(data) {
 					latest = data;
 					$("#latest").text(latest);
 				
@@ -71,12 +100,15 @@
 							$("#result").append("You didn't download Chromium using this extension. Can't track revision.<br />");
 						}
 						
-						var download_link = base_url + os_download[os] + latest + '/mini_installer.exe';
+						$("#result").append("<a href=\"" + base_url + os_directories[os] + latest + "/chrome-" + os_archives[os] + "\">Download archive</a>");
 						
-						$("#result").append("<a href=\"" + download_link + "\">Download mini_installer</a>");
+						if (os == "win")
+						{
+							$("#result").append("<br /><a href=\"" + base_url + os_directories[os] + latest + "/mini_installer.exe\">Download mini installer</a>");
+						}
 						
 						$("#result a").click(function() {
-							window.open(download_link);
+							window.open($(this).attr("href"));
 							localStorage['latest_download'] = latest;
 						});
 					}
@@ -86,9 +118,6 @@
 					}
 				});
 			});
-			//	localStorage['latest_download'] = version;
-			//	url = getDownloadUrl(version, false);
-			//	window.open(url);
 		</script>
 	</head>
 	<body>
