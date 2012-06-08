@@ -1,0 +1,108 @@
+<html>
+	<head>
+		<style type="text/css">
+			body
+			{
+				overflow-x: hidden;
+				color: black;
+				width: 300px;
+				margin: 10px;
+				font-size: 16px;
+				line-height: 1.5;
+				font-family: Tahoma;
+			}
+		</style>
+
+		<script src="jquery-1.7.2.min.js"></script>
+		<script>
+			// defines
+			
+			var base_url = 'http://commondatastorage.googleapis.com/chromium-browser-continuous/';
+			var base_win_latest = base_url + 'Win/LAST_CHANGE';
+		
+			var os_names = {
+				'win' : 'Windows',
+				'x11' : 'Unix',
+				'mac' : 'MacOS',
+				'linux' : 'Linux'
+			}
+			
+			var os_download = {
+				'win' : 'Win/'
+			}
+			
+			// variables
+			
+			var os = "unknown";
+			
+			$(document).ready(function () {
+				$("#latest").html("<img src=\"loading.gif\" />");
+				
+				if (navigator.appVersion.indexOf("Win")!=-1) os = 'win';
+				if (navigator.appVersion.indexOf("Mac")!=-1) os = 'mac';
+				if (navigator.appVersion.indexOf("X11")!=-1) os = 'x11';
+				if (navigator.appVersion.indexOf("Linux")!=-1) os = 'linux';
+			
+				re = /Chrome\/(.*)\sSafari/g;
+				version_curr = re.exec(window.navigator.userAgent);
+				version_curr = version_curr[1];
+			
+				$("#version").text("Chromium " + version_curr + " on " + os_names[os]);
+				
+				var downloaded = "none";
+				
+				if (localStorage['latest_download'])
+				{
+					downloaded = localStorage['latest_download'];
+					$("#downloaded").text(localStorage['latest_download']);
+				}
+				
+				var latest; 
+				
+				$.get(base_win_latest, function(data) {
+					latest = data;
+					$("#latest").text(latest);
+				
+					if (latest != downloaded)
+					{
+						$("#result").text("");
+						if (downloaded == "none")
+						{
+							$("#result").append("You didn't download Chromium using this extension. Can't track revision.<br />");
+						}
+						
+						var download_link = base_url + os_download[os] + latest + '/mini_installer.exe';
+						
+						$("#result").append("<a href=\"" + download_link + "\">Download mini_installer</a>");
+						
+						$("#result a").click(function() {
+							window.open(download_link);
+							localStorage['latest_download'] = latest;
+						});
+					}
+					else
+					{
+						$("#result").text("You are using latest Chromium build.");
+					}
+				});
+			});
+			//	localStorage['latest_download'] = version;
+			//	url = getDownloadUrl(version, false);
+			//	window.open(url);
+		</script>
+	</head>
+	<body>
+		<h3><center>Chromium Latest Build</center></h3>
+		Your version:<br />
+		<span id="version">Problem with jQuery / Your browser (^^)</span>
+		<br />
+		Downloaded:<br />
+		<span id="downloaded">none</span>
+		<br />
+		Latest available:<br />
+		<span id="latest">none</span>
+		<br />
+		<br />
+		<span id="result"></span>
+	</body>
+</html>

@@ -13,7 +13,6 @@
 	},
 	
 	"permissions": [
-		"http://build.chromium.org/",
-		"http://planet.chromium.org/"
+		"http://commondatastorage.googleapis.com/"
 	]
 }
